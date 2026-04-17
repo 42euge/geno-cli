@@ -11,7 +11,7 @@ type Config struct {
 func Parse() Config {
 	cfg := Config{}
 	flag.StringVar(&cfg.OllamaURL, "url", "http://localhost:11434", "Ollama API URL")
-	flag.StringVar(&cfg.Model, "model", "gemma4:4b", "Model name")
+	flag.StringVar(&cfg.Model, "model", "gemma4:e4b", "Model name")
 	flag.BoolVar(&cfg.NoTools, "no-tools", false, "Disable tool use (plain chat mode)")
 	flag.Parse()
 	return cfg
