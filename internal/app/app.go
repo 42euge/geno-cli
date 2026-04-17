@@ -64,17 +64,24 @@ func New(client *ollama.Client, model string, noTools bool) Model {
 	sp.Spinner = spinner.Dot
 	sp.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
 
+	loop := agent.NewLoop(client, model, noTools)
+	modeStr := "agentic"
+	if !loop.ToolsActive() {
+		modeStr = "chat"
+	}
+	welcome := "Welcome to geno-cli! Using model: " + model + " (" + modeStr + " mode)\nType a message and press Enter.\n"
+
 	vp := viewport.New(80, 20)
-	vp.SetContent("Welcome to geno-cli! Using model: " + model + "\nType a message and press Enter.\n")
+	vp.SetContent(welcome)
 
 	return Model{
 		viewport: vp,
 		textarea: ta,
 		spinner:  sp,
 		state:    stateIdle,
-		loop:     agent.NewLoop(client, model, noTools),
+		loop:     loop,
 		model:    model,
-		content:  "Welcome to geno-cli! Using model: " + model + "\nType a message and press Enter.\n",
+		content:  welcome,
 	}
 }
 

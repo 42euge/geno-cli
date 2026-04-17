@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/42euge/geno-cli/internal/chat"
 	"github.com/42euge/geno-cli/internal/ollama"
@@ -13,11 +14,12 @@ import (
 const MaxToolRounds = 10
 
 type Loop struct {
-	client   *ollama.Client
-	model    string
-	history  *chat.History
-	registry *tools.Registry
-	noTools  bool
+	client        *ollama.Client
+	model         string
+	history       *chat.History
+	registry      *tools.Registry
+	noTools       bool
+	toolsDisabled bool // set true if model doesn't support tools
 }
 
 func NewLoop(client *ollama.Client, model string, noTools bool) *Loop {
@@ -76,14 +78,25 @@ func (l *Loop) run(ctx context.Context, out chan<- StreamMsg) {
 			Messages: l.history.ToOllama(),
 			Stream:   true,
 		}
-		if !l.noTools {
+		if !l.noTools && !l.toolsDisabled {
 			req.Tools = l.registry.Definitions()
 		}
 
 		ch, err := l.client.Chat(ctx, req)
 		if err != nil {
-			out <- StreamMsg{Error: err}
-			return
+			// If model doesn't support tools, retry without them
+			if !l.toolsDisabled && strings.Contains(err.Error(), "does not support tools") {
+				l.toolsDisabled = true
+				req.Tools = nil
+				ch, err = l.client.Chat(ctx, req)
+				if err != nil {
+					out <- StreamMsg{Error: err}
+					return
+				}
+			} else {
+				out <- StreamMsg{Error: err}
+				return
+			}
 		}
 
 		var fullContent string
@@ -104,8 +117,15 @@ func (l *Loop) run(ctx context.Context, out chan<- StreamMsg) {
 			}
 		}
 
-		// Add assistant message to history
-		l.history.Add(chat.Message{Role: chat.RoleAssistant, Content: fullContent})
+		// Add assistant message to history (including tool calls if any)
+		assistantMsg := chat.Message{Role: chat.RoleAssistant, Content: fullContent}
+		for _, tc := range toolCalls {
+			assistantMsg.ToolCalls = append(assistantMsg.ToolCalls, chat.ToolCallRecord{
+				Name:      tc.Function.Name,
+				Arguments: string(tc.Function.Arguments),
+			})
+		}
+		l.history.Add(assistantMsg)
 
 		if len(toolCalls) == 0 {
 			out <- StreamMsg{Done: &doneInfo}
@@ -143,6 +163,11 @@ func ToolResultMessage(name, content string) ollama.Message {
 		Role:    "tool",
 		Content: content,
 	}
+}
+
+// ToolsActive returns true if the model is using tools (not in chat-only mode).
+func (l *Loop) ToolsActive() bool {
+	return !l.noTools && !l.toolsDisabled
 }
 
 // History returns the raw conversation history (exported for serialization).
