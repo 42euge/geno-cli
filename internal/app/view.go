@@ -37,8 +37,13 @@ func (m Model) View() string {
 		tokens = fmt.Sprintf(" | tokens: %d/%d", m.promptTokens, m.evalTokens)
 	}
 
+	modeStr := "agentic"
+	if !m.loop.ToolsActive() {
+		modeStr = "chat"
+	}
+
 	status := statusStyle.Width(m.width).Render(
-		fmt.Sprintf(" geno-cli | %s | %s%s", m.model, stateStr, tokens),
+		fmt.Sprintf(" geno-cli | %s (%s) | %s%s", m.model, modeStr, stateStr, tokens),
 	)
 
 	// Input area

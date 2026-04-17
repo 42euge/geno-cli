@@ -38,8 +38,10 @@ func (c *Client) Chat(ctx context.Context, req ChatRequest) (<-chan ChatResponse
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		resp.Body.Close()
-		return nil, fmt.Errorf("ollama returned status %d", resp.StatusCode)
+		defer resp.Body.Close()
+		var buf bytes.Buffer
+		buf.ReadFrom(resp.Body)
+		return nil, fmt.Errorf("ollama returned status %d: %s", resp.StatusCode, buf.String())
 	}
 
 	ch := make(chan ChatResponse, 64)
