@@ -1,11 +1,19 @@
 # geno-cli
 
-Agentic coding assistant TUI powered by Gemma 4 via Ollama. Claude Code-like experience running entirely locally — private, free, no API keys.
+Agentic coding assistant TUI powered by Gemma 4 via Ollama. A local coding agent experience — private, free, no API keys.
 
-## Install as a Claude Code skill
+## Install via geno-tools
+
+From within an agent session:
+
+```
+/geno-tools install geno-cli
+```
+
+Or from the command line:
 
 ```bash
-npx skills add 42euge/geno-cli -g -a claude-code -y
+geno-tools install geno-cli
 ```
 
 ## Install standalone
@@ -13,7 +21,7 @@ npx skills add 42euge/geno-cli -g -a claude-code -y
 ```bash
 git clone https://github.com/42euge/geno-cli.git
 cd geno-cli
-./install.sh
+make install
 ```
 
 Or with Go:

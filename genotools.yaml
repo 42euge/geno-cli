@@ -1,0 +1,5 @@
+name: geno-cli
+version: "0.1.0"
+description: >-
+  Agentic coding assistant TUI powered by Gemma 4 via Ollama.
+  Runs entirely locally — private, free, no API keys.
