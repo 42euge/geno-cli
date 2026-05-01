@@ -64,3 +64,23 @@ geno-cli/
 - Single umbrella skill — no sub-skills currently
 - Go source lives under `internal/` following standard Go project layout
 - Build and install via `Makefile` targets (`make build`, `make install`)
+
+### Prefix aliasing
+
+The canonical binary and source name is `geno-cli`. When installed via `geno-tools`, the binary may be aliased to a shorter `/gt-cli` slash command for interactive use. The mapping is:
+
+| Canonical (source) | Alias (per-install) |
+|---------------------|---------------------|
+| `geno-cli`          | `/gt-cli`           |
+
+The `geno-` prefix is the canonical form used in source code, `SKILL.md` frontmatter, and `genotools.yaml`. The `/gt-` alias is configured at install time by `geno-tools` and should never appear in source — it is a user-facing convenience only.
+
+### Adding new skills
+
+To add a new skill (sub-skillset) to this repo:
+
+1. Create a directory under `skills/<skill-name>/`.
+2. Add a `SKILL.md` inside it with valid frontmatter (`name`, `description`, `allowed-tools`, `metadata`). Follow `skills/geno-cli/SKILL.md` as a template.
+3. Register the skill in the Skills table at the top of this file.
+4. If the skill needs its own Go entrypoint, add it under `cmd/<skill-name>/` and wire it into the `Makefile`.
+5. Update `genotools.yaml` if the skill should be discoverable by `geno-tools`.
