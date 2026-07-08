@@ -1,14 +1,13 @@
 .PHONY: build install clean run
 
 build:
-	go build -o geno-cli ./cmd/geno-cli
+	go build -o geno ./cmd/geno
 
 install: build
-	mkdir -p ~/.geno/bin
-	ln -sfn $(PWD)/geno-cli ~/.geno/bin/geno-cli
+	cp geno /usr/local/bin/geno
 
 clean:
-	rm -f geno-cli
+	rm -f geno
 
 run: build
-	./geno-cli
+	./geno

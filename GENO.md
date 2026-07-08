@@ -1,4 +1,4 @@
-# geno-cli — local agentic coding assistant TUI
+# geno-cli — unified entry point for the geno ecosystem
 
 Terminal-based coding assistant powered by Gemma 4 via Ollama. Provides streaming chat with tool use (file read/write, shell exec, grep) and a rich TUI built on Go's Charmbracelet ecosystem. Runs entirely locally — private, free, no API keys.
 
