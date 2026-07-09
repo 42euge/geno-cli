@@ -110,7 +110,7 @@ Usage:
   geno install --list          list supported agents and config dirs
   geno version                 print version
 
-Supported agents:  claude-code  codex  cursor  windsurf
+Supported agents:  claude-code  codex  antigravity
 
 Install:
   brew tap 42euge/geno && brew install geno
